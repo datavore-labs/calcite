@@ -178,7 +178,12 @@ public class RelToSqlConverter extends SqlImplementor
     // "select a, b, sum(x) from ( ... ) group by a, b"
     final Result x = visitChild(0, e.getInput());
     final Builder builder;
-    if (e.getInput() instanceof Project) {
+    if (x.clauses.contains(Clause.GROUP_BY)) {
+      x.subSelect();
+      builder = x.builder(e.getInput(), Clause.GROUP_BY);
+      // or
+      // builder = x.builder(e.getInput(), Clause.SELECT, Clause.GROUP_BY);
+    } else if (e.getInput() instanceof Project) {
       builder = x.builder(e);
       builder.clauses.add(Clause.GROUP_BY);
     } else {
